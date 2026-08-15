@@ -37,6 +37,7 @@
       @media (max-width:720px) { .projects-toolbar { gap:1rem; }.result-count { margin-top:0; text-align:right; } }
       @media (max-width:540px) { .topbar { align-items:flex-start; flex-wrap:wrap; padding:.7rem 0; }.topbar-tools { width:100%; justify-content:space-between; }.topbar-tools .tilt-mode { padding-right:0; border-right:0; } }
       .site-like { display:inline-flex; align-items:center; gap:.38rem; min-height:2.25rem; padding:.4rem .58rem; border:1px solid var(--line); background:rgba(26,24,20,.54); color:var(--muted); cursor:pointer; font-family:'Courier Prime','Microsoft YaHei',monospace; font-size:.72rem; font-weight:700; letter-spacing:.025em; transition:all .15s ease; }.site-like iconify-icon { color:var(--mustard); font-size:1.05rem; }.site-like strong { color:var(--paper); font-size:.76rem; }.site-like:hover,.site-like:focus-visible { border-color:var(--mustard); background:rgba(196,148,31,.12); color:var(--paper); outline:none; transform:translateY(-2px); }.site-like[aria-pressed="true"] { border-color:var(--mustard); background:rgba(196,148,31,.16); color:var(--paper); cursor:default; }.site-like.is-unavailable { cursor:not-allowed; opacity:.6; }
+      .archive { scroll-margin-top:5.75rem; } @media (max-width:540px) { .archive { scroll-margin-top:8.25rem; } }
     </style>
   </head>
   <body>
@@ -85,7 +86,21 @@
         function storedTiltMode() { try { return window.localStorage.getItem(tiltModeStorageKey) === 'press'; } catch { return false; } }
         function saveTiltMode() { try { window.localStorage.setItem(tiltModeStorageKey, reverseTilt ? 'press' : 'float'); } catch {} }
         let reverseTilt = storedTiltMode();
-        function enableGamepactTilt(grid) { const cards = [...grid.querySelectorAll('.project-card')]; const canTilt = window.VanillaTilt && window.matchMedia('(hover:hover) and (pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (!canTilt) return; cards.forEach((card) => { card.vanillaTilt?.destroy(); window.VanillaTilt.init(card, { max:10, speed:300, glare:true, 'max-glare':0.3, scale:1.05, reverse:reverseTilt, 'full-page-listening':false, gyroscope:false }); if (card.dataset.tiltBound) return; card.dataset.tiltBound = 'true'; card.addEventListener('mouseenter', () => { grid.classList.add('has-active-card'); cards.forEach((other) => other.classList.toggle('is-tilt-active', other === card)); }); card.addEventListener('mouseleave', () => { grid.classList.remove('has-active-card'); cards.forEach((other) => other.classList.remove('is-tilt-active')); }); card.addEventListener('pointerdown', () => card.classList.add('is-pressed')); ['pointerup', 'pointercancel', 'pointerleave'].forEach((eventName) => card.addEventListener(eventName, () => card.classList.remove('is-pressed'))); }); }
+        function enableGamepactTilt(grid) {
+          const cards = [...grid.querySelectorAll('.project-card')];
+          const canTilt = window.VanillaTilt && window.matchMedia('(hover:hover) and (pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!canTilt) return;
+          cards.forEach((card) => {
+            card.vanillaTilt?.destroy();
+            window.VanillaTilt.init(card, { max:10, speed:300, glare:true, 'max-glare':0.3, scale:1.05, reverse:reverseTilt, 'full-page-listening':false, gyroscope:false });
+            if (card.dataset.tiltBound) return;
+            card.dataset.tiltBound = 'true';
+            card.addEventListener('mouseenter', () => { grid.classList.add('has-active-card'); cards.forEach((other) => other.classList.toggle('is-tilt-active', other === card)); });
+            card.addEventListener('mouseleave', () => { grid.classList.remove('has-active-card'); cards.forEach((other) => other.classList.remove('is-tilt-active')); });
+            card.addEventListener('pointerdown', () => card.classList.add('is-pressed'));
+            ['pointerup', 'pointercancel', 'pointerleave'].forEach((eventName) => card.addEventListener(eventName, () => card.classList.remove('is-pressed')));
+          });
+        }
         function renderCollection(grid, items, query, label) { const filtered = items.filter((item) => searchable(item).includes(query)).sort((left, right) => (left.title || '').localeCompare(right.title || '', 'en', { sensitivity:'base' })); grid.replaceChildren(); if (!filtered.length) grid.append(create('p', 'empty', query ? `> 没有匹配的${label}。` : `> 暂无${label}项目。`)); filtered.forEach((item, index) => grid.append(projectCard(item, index))); enableGamepactTilt(grid); return filtered.length; }
         const search = document.querySelector('#project-search'); const gameGrid = document.querySelector('#game-grid'); const modGrid = document.querySelector('#mod-grid'); const result = document.querySelector('#result-count');
         function renderAll() { const query = search.value.trim().toLocaleLowerCase(); const visibleMods = renderCollection(modGrid, mods, query, 'MOD'); const visibleGames = renderCollection(gameGrid, games, query, '游戏'); result.textContent = query ? `MOD ${visibleMods}/${mods.length} · 游戏 ${visibleGames}/${games.length}` : `MOD ${mods.length} · 游戏 ${games.length}`; }
