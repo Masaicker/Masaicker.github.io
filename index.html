@@ -45,6 +45,12 @@
       .project-card:hover::before,.project-card:focus-within::before { opacity:.78; }
       .project-card:hover::after,.project-card:focus-within::after { border-color:rgba(255,231,160,.28); opacity:.62; }
       .project-card .js-tilt-glare { opacity:.78!important; }
+      .project-card { cursor:grab; touch-action:pan-y; user-select:none; -webkit-user-drag:none; }
+      .drag-hold-meter { position:absolute; z-index:12; width:34px; height:34px; padding:3px; border-radius:50%; background:conic-gradient(var(--mustard) calc(var(--hold-progress,0) * 1turn),rgba(245,240,230,.18) 0); box-shadow:0 4px 13px rgba(0,0,0,.42); opacity:0; pointer-events:none; transform:translate(-50%,-50%) scale(.72); transition:opacity 130ms ease,transform 180ms cubic-bezier(.2,.85,.28,1); }.drag-hold-meter::after { display:block; width:100%; height:100%; border-radius:50%; background:rgba(26,24,20,.88); content:''; }.drag-hold-meter.is-visible { opacity:1; transform:translate(-50%,-50%) scale(1); }
+      .project-card.is-dragging { position:fixed!important; z-index:100!important; cursor:grabbing; opacity:.99; pointer-events:none; will-change:left,top,transform; transition:transform 180ms cubic-bezier(.2,.8,.2,1),box-shadow 220ms ease,filter 220ms ease!important; box-shadow:2px 3px 0 rgba(196,148,31,.78),5px 8px 0 rgba(91,70,36,.52),18px 28px 42px rgba(0,0,0,.52)!important; filter:saturate(1.05) brightness(1.025); }
+      .project-card-placeholder { width:100%; min-height:0; height:var(--drag-placeholder-height, 300px); opacity:0; pointer-events:none; }
+      .project-grid.is-dragging { user-select:none; }
+      .project-grid.is-dragging .project-card { will-change:transform; }
     </style>
   </head>
   <body>
@@ -57,8 +63,7 @@
       <footer><span>BY MASAICKER</span><nav id="footer-socials" class="footer-socials" aria-label="社交链接"></nav></footer>
     </div>
     <script>
-      const SITE_DATA = {"profile":{"name":"Masaicker","intro":"是啊，做什么","links":[{"label":"GitHub","url":"https://github.com/Masaicker","icon":"github"},{"label":"Ko-fi","url":"https://ko-fi.com/masaicker","icon":"kofi"}],"avatars":[{"label":"bbg","src":"assets/avatars/bbg.png","fit":"contain"},{"label":"logo","src":"assets/avatars/logo.png","fit":"contain"},{"label":"main","src":"assets/avatars/main.png","fit":"contain"}]},"games":[{"title":"落叶归根","status":"已发布","steamUrl":"https://store.steampowered.com/app/2530300/","cover":"","description":"Mhz 制作的游戏项目。","searchTerms":"落叶归根 Climbing Back to the Mothership","links":[{"platform":"Steam 商店","url":"https://store.steampowered.com/app/2530300/"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2530300/library_600x900_2x.jpg?t=1786422187"},{"title":"只钮","status":"开发中","steamUrl":"","cover":"https://img.71acg.net/kbdev/opensj/20260714/16274390601","description":"Mhz 制作的游戏项目。","searchTerms":"只钮 试玩 QQ 群 1060032672","links":[{"platform":"QQ 群","url":"https://qm.qq.com/q/XPPh0lurGa"}]}],"mods":[{"title":"Big Walk","status":"已发布","steamUrl":"https://store.steampowered.com/app/1478500/","cover":"","description":"Mhz 制作的 Big Walk MOD 集合。","searchTerms":"Big Walk MOD 模组 Nexus Mods Thunderstore Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=9774"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/big-walk/p/Mhz"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1478500/5ce4747b1a7c3f3431fefd16976ce4316ac3615e/library_capsule_2x.jpg?t=1785911674"},{"title":"Demon Lord: Just a Block","status":"已发布","steamUrl":"https://store.steampowered.com/app/3720420/","cover":"","description":"Mhz 制作的 Demon Lord: Just a Block MOD 集合。","searchTerms":"Demon Lord Just a Block 卡片魔王 只剩个头 MOD 模组 Steam 创意工坊 Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=3720420"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3720420/48d3dab2f41260954669d589dbf94b58ae900a97/library_capsule_2x.jpg?t=1785911083"},{"title":"Drova","status":"已发布","steamUrl":"https://store.steampowered.com/app/1585180/","cover":"","description":"Mhz 制作的 Drova MOD 集合。","searchTerms":"Drova Forsaken Kin 困兽之国 MOD 模组 Nexus Mods Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/drovaforsakenkin/mods/24"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1585180/library_600x900_2x.jpg?t=1781102979"},{"title":"Escape from Duckov","status":"已发布","steamUrl":"https://store.steampowered.com/app/3167020/","cover":"","description":"Mhz 制作的 Escape from Duckov MOD 集合。","searchTerms":"Escape from Duckov 逃离鸭科夫 MOD 模组 Steam Nexus Mods GitHub Releases Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=3167020"},{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=8316"},{"platform":"GitHub Releases","url":"https://github.com/Masaicker/DashPlusMod-Duckov/releases"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3167020/495690605e6e484c2200f8be245d070d88f2ecf3/library_600x900_2x.jpg?t=1783321966"},{"title":"Hollow Knight: Silksong","status":"已发布","steamUrl":"https://store.steampowered.com/app/1030300/","cover":"","description":"Mhz 制作的 Hollow Knight: Silksong MOD 集合。","searchTerms":"Hollow Knight Silksong 空洞骑士 丝之歌 MOD 模组 Nexus Mods Thunderstore Mhz YurisCat","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/YurisCat/mods?gameId=8136"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/hollow-knight-silksong/p/Mhz/"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1030300/93637c34351160eaa7d7ff0cce69cb4312abb819/library_capsule_2x.jpg?t=1776125736"},{"title":"Human: Fall Flat","status":"已发布","steamUrl":"https://store.steampowered.com/app/477160/","cover":"","description":"Mhz 制作的 Human: Fall Flat MOD 集合。","searchTerms":"Human Fall Flat 人类一败涂地 MOD 模组 Steam 创意工坊 Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=477160"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/477160/f2ee7a2d4edb2186dcf846da3e406dbb151c142f/library_capsule_2x.jpg?t=1784801515"},{"title":"Lethal Company","status":"已发布","steamUrl":"https://store.steampowered.com/app/1966720/","cover":"","description":"Mhz 制作的 Lethal Company MOD 集合。","searchTerms":"Lethal Company 致命公司 MOD 模组 Thunderstore Mhz Masaicker","links":[{"platform":"Thunderstore","url":"https://thunderstore.io/c/lethal-company/p/Mhz/"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1966720/library_600x900_2x.jpg?t=1775380053"},{"title":"PEAK","status":"已发布","steamUrl":"https://store.steampowered.com/app/3527290/","cover":"","description":"Mhz 制作的 PEAK MOD 集合。","searchTerms":"PEAK MOD 模组 Thunderstore GameTweaks Mhz Masaicker","links":[{"platform":"Thunderstore","url":"https://thunderstore.io/c/peak/p/Mhz/GameTweaks"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3527290/480bd879ac737921bfa2529a6fea15961267ad21/library_600x900_2x.jpg?t=1786470571"},{"title":"Phoenotopia: Awakening","status":"已发布","steamUrl":"https://store.steampowered.com/app/1436590/","cover":"","description":"Mhz 制作的 Phoenotopia: Awakening MOD 集合。","searchTerms":"Phoenotopia Awakening 菲诺托邦 觉醒 MOD 模组 Nexus Mods Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=3621"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1436590/library_600x900_2x.jpg?t=1725004745"},{"title":"R.E.P.O.","status":"已发布","steamUrl":"https://store.steampowered.com/app/3241660/","cover":"","description":"Mhz 制作的 R.E.P.O. MOD 集合。","searchTerms":"REPO R.E.P.O. MOD 模组 Nexus Mods Thunderstore YMC Mhz YurisCat","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/YurisCat/mods?gameId=7398"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/repo/p/YMC_MHZ"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3241660/46b4813ef1cd20664299c9e5de847f3579b44f2e/library_600x900_2x.jpg?t=1778158882"},{"title":"Slay the Spire 2","status":"已发布","steamUrl":"https://store.steampowered.com/app/2868840/","cover":"","description":"Mhz 制作的 Slay the Spire 2 MOD 集合。","searchTerms":"Slay the Spire 2 杀戮尖塔2 MOD 模组 Steam 创意工坊 Nexus Mods Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=2868840"},{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=8916"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2868840/4bf4dad2c9c82b1989eee4a664ca7ce7bf3cc4a7/library_600x900_2x.jpg?t=1786139218"},{"title":"YAPYAP","status":"已发布","steamUrl":"https://store.steampowered.com/app/3834090/","cover":"","description":"Mhz 制作的 YAPYAP MOD 集合。","searchTerms":"YAPYAP MOD 模组 Nexus Mods Thunderstore Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=8424"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/yapyap/p/Mhz"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3834090/8a16962802f343a37b6b5524a1128f554b2e43ad/library_capsule_2x.jpg?t=1784273304"}]};
-      SITE_DATA.games.find((project) => project.title === '落叶归根')?.links.push({ platform:'QQ 群', url:'https://qm.qq.com/q/DDGmlWNur6' });
+      const SITE_DATA = {"profile":{"name":"Masaicker","intro":"是啊，做什么","links":[{"label":"GitHub","url":"https://github.com/Masaicker","icon":"github"},{"label":"Steam Community","url":"https://steamcommunity.com/id/Masaicker/","icon":"steam"},{"label":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods","icon":"nexusmods"},{"label":"Bilibili","url":"https://space.bilibili.com/1542613","icon":"bilibili"},{"label":"Ko-fi","url":"https://ko-fi.com/masaicker","icon":"kofi"}],"avatars":[{"label":"bbg","src":"assets/avatars/bbg.png","fit":"contain"},{"label":"logo","src":"assets/avatars/logo.png","fit":"contain"},{"label":"main","src":"assets/avatars/main.png","fit":"contain"}]},"games":[{"title":"落叶归根","status":"已发布","steamUrl":"https://store.steampowered.com/app/2530300/","cover":"","description":"Mhz 制作的游戏项目。","searchTerms":"落叶归根 Climbing Back to the Mothership","links":[{"platform":"Steam 商店","url":"https://store.steampowered.com/app/2530300/"},{"platform":"QQ 群","url":"https://qm.qq.com/q/DDGmlWNur6"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2530300/library_600x900_2x.jpg?t=1786422187"},{"title":"只钮","status":"开发中","steamUrl":"","cover":"https://img.71acg.net/kbdev/opensj/20260714/16274390601","description":"Mhz 制作的游戏项目。","searchTerms":"只钮 试玩 QQ 群 1060032672","links":[{"platform":"QQ 群","url":"https://qm.qq.com/q/XPPh0lurGa"}]}],"mods":[{"title":"Big Walk","status":"已发布","steamUrl":"https://store.steampowered.com/app/1478500/","cover":"","description":"Mhz 制作的 Big Walk MOD 集合。","searchTerms":"Big Walk MOD 模组 Nexus Mods Thunderstore Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=9774"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/big-walk/p/Mhz"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1478500/5ce4747b1a7c3f3431fefd16976ce4316ac3615e/library_capsule_2x.jpg?t=1785911674"},{"title":"Demon Lord: Just a Block","status":"已发布","steamUrl":"https://store.steampowered.com/app/3720420/","cover":"","description":"Mhz 制作的 Demon Lord: Just a Block MOD 集合。","searchTerms":"Demon Lord Just a Block 卡片魔王 只剩个头 MOD 模组 Steam 创意工坊 Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=3720420"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3720420/48d3dab2f41260954669d589dbf94b58ae900a97/library_capsule_2x.jpg?t=1785911083"},{"title":"Drova","status":"已发布","steamUrl":"https://store.steampowered.com/app/1585180/","cover":"","description":"Mhz 制作的 Drova MOD 集合。","searchTerms":"Drova Forsaken Kin 困兽之国 MOD 模组 Nexus Mods Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/drovaforsakenkin/mods/24"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1585180/library_600x900_2x.jpg?t=1781102979"},{"title":"Escape from Duckov","status":"已发布","steamUrl":"https://store.steampowered.com/app/3167020/","cover":"","description":"Mhz 制作的 Escape from Duckov MOD 集合。","searchTerms":"Escape from Duckov 逃离鸭科夫 MOD 模组 Steam Nexus Mods GitHub Releases Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=3167020"},{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=8316"},{"platform":"GitHub Releases","url":"https://github.com/Masaicker/DashPlusMod-Duckov/releases"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3167020/495690605e6e484c2200f8be245d070d88f2ecf3/library_600x900_2x.jpg?t=1783321966"},{"title":"Hollow Knight: Silksong","status":"已发布","steamUrl":"https://store.steampowered.com/app/1030300/","cover":"","description":"Mhz 制作的 Hollow Knight: Silksong MOD 集合。","searchTerms":"Hollow Knight Silksong 空洞骑士 丝之歌 MOD 模组 Nexus Mods Thunderstore Mhz YurisCat","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/YurisCat/mods?gameId=8136"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/hollow-knight-silksong/p/Mhz/"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1030300/93637c34351160eaa7d7ff0cce69cb4312abb819/library_capsule_2x.jpg?t=1776125736"},{"title":"Human: Fall Flat","status":"已发布","steamUrl":"https://store.steampowered.com/app/477160/","cover":"","description":"Mhz 制作的 Human: Fall Flat MOD 集合。","searchTerms":"Human Fall Flat 人类一败涂地 MOD 模组 Steam 创意工坊 Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=477160"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/477160/f2ee7a2d4edb2186dcf846da3e406dbb151c142f/library_capsule_2x.jpg?t=1784801515"},{"title":"Lethal Company","status":"已发布","steamUrl":"https://store.steampowered.com/app/1966720/","cover":"","description":"Mhz 制作的 Lethal Company MOD 集合。","searchTerms":"Lethal Company 致命公司 MOD 模组 Thunderstore Mhz Masaicker","links":[{"platform":"Thunderstore","url":"https://thunderstore.io/c/lethal-company/p/Mhz/"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1966720/library_600x900_2x.jpg?t=1775380053"},{"title":"PEAK","status":"已发布","steamUrl":"https://store.steampowered.com/app/3527290/","cover":"","description":"Mhz 制作的 PEAK MOD 集合。","searchTerms":"PEAK MOD 模组 Thunderstore GameTweaks Mhz Masaicker","links":[{"platform":"Thunderstore","url":"https://thunderstore.io/c/peak/p/Mhz/GameTweaks"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3527290/480bd879ac737921bfa2529a6fea15961267ad21/library_600x900_2x.jpg?t=1786470571"},{"title":"Phoenotopia: Awakening","status":"已发布","steamUrl":"https://store.steampowered.com/app/1436590/","cover":"","description":"Mhz 制作的 Phoenotopia: Awakening MOD 集合。","searchTerms":"Phoenotopia Awakening 菲诺托邦 觉醒 MOD 模组 Nexus Mods Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=3621"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1436590/library_600x900_2x.jpg?t=1725004745"},{"title":"R.E.P.O.","status":"已发布","steamUrl":"https://store.steampowered.com/app/3241660/","cover":"","description":"Mhz 制作的 R.E.P.O. MOD 集合。","searchTerms":"REPO R.E.P.O. MOD 模组 Nexus Mods Thunderstore YMC Mhz YurisCat","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/YurisCat/mods?gameId=7398"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/repo/p/YMC_MHZ"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3241660/46b4813ef1cd20664299c9e5de847f3579b44f2e/library_600x900_2x.jpg?t=1778158882"},{"title":"Slay the Spire 2","status":"已发布","steamUrl":"https://store.steampowered.com/app/2868840/","cover":"","description":"Mhz 制作的 Slay the Spire 2 MOD 集合。","searchTerms":"Slay the Spire 2 杀戮尖塔2 MOD 模组 Steam 创意工坊 Nexus Mods Mhz Masaicker","links":[{"platform":"Steam 创意工坊","url":"https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=2868840"},{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=8916"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2868840/4bf4dad2c9c82b1989eee4a664ca7ce7bf3cc4a7/library_600x900_2x.jpg?t=1786139218"},{"title":"YAPYAP","status":"已发布","steamUrl":"https://store.steampowered.com/app/3834090/","cover":"","description":"Mhz 制作的 YAPYAP MOD 集合。","searchTerms":"YAPYAP MOD 模组 Nexus Mods Thunderstore Mhz Masaicker","links":[{"platform":"Nexus Mods","url":"https://www.nexusmods.com/profile/Masaicker/mods?gameId=8424"},{"platform":"Thunderstore","url":"https://thunderstore.io/c/yapyap/p/Mhz"}],"steamCover":"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3834090/8a16962802f343a37b6b5524a1128f554b2e43ad/library_capsule_2x.jpg?t=1784273304"}]};
       (() => {
         'use strict';
         const profile = SITE_DATA.profile || {};
@@ -73,7 +78,7 @@
         const localTime = document.querySelector('#local-time'); function updateLocalTime() { const now = new Date(); localTime.dateTime = now.toISOString(); localTime.textContent = now.toLocaleTimeString('en-GB', { hour12:false }); } updateLocalTime(); window.setInterval(updateLocalTime, 1000);
         document.querySelector('#game-count').textContent = String(games.length).padStart(2, '0'); document.querySelector('#mod-count').textContent = String(mods.length).padStart(2, '0');
 
-        const socialIcons = { github: 'mdi:github', kofi: 'simple-icons:kofi' };
+        const socialIcons = { github: 'mdi:github', steam: 'mdi:steam', nexusmods: 'simple-icons:nexusmods', bilibili: 'ri:bilibili-fill', kofi: 'simple-icons:kofi' };
         const socialContainer = document.querySelector('#footer-socials');
         (profile.links || []).forEach((link) => { const url = safeHttpUrl(link.url); if (!url) return; const anchor = create('a', 'footer-icon'); anchor.href = url; anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; anchor.title = link.label || '链接'; anchor.setAttribute('aria-label', link.label || '链接'); const icon = document.createElement('iconify-icon'); icon.setAttribute('icon', socialIcons[link.icon] || 'mdi:open-in-new'); icon.setAttribute('aria-hidden', 'true'); anchor.append(icon); socialContainer.append(anchor); });
 
@@ -91,6 +96,8 @@
         function setCoverAura(card, url) { if (!url) return; card.style.setProperty('--cover-art', `url("${String(url).replace(/["\\\\\n\r]/g, '\\\\$&')}")`); }
         function projectCard(project, index) {
           const card = create('article', 'project-card');
+          card.draggable = false;
+          card.setAttribute('aria-grabbed', 'false');
           card.style.setProperty('--delay', `${Math.min(index * 90, 500)}ms`);
           const cover = create('div', 'cover');
           const source = coverUrl(project);
@@ -100,6 +107,7 @@
           if (source) {
             const image = new Image();
             image.src = source;
+            image.draggable = false;
             image.alt = `${project.title || '项目'} 的宣传图`;
             let usedFallback = false;
             image.addEventListener('error', () => {
@@ -176,6 +184,204 @@
         async function loadLikes() { try { const response = await fetch(likeEndpoint, { cache:'no-store' }); if (!response.ok) throw new Error('Unable to load likes'); const payload = await response.json(); showLikeCount(payload.likes); setLikeState(wasLiked()); } catch { likeCount.textContent = '—'; likeButton.classList.add('is-unavailable'); likeButton.title = '点赞服务暂不可用'; } }
         likeButton.addEventListener('click', async () => { if (wasLiked() || likeInFlight || likeButton.classList.contains('is-unavailable')) return; likeInFlight = true; likeButton.disabled = true; try { const response = await fetch(likeEndpoint, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ visitorId:visitorId() }) }); if (!response.ok) throw new Error('Unable to add like'); const payload = await response.json(); showLikeCount(payload.likes); markLiked(); setLikeState(true); } catch { likeButton.title = '点赞服务暂不可用'; } finally { likeInFlight = false; likeButton.disabled = false; } });
         setLikeState(wasLiked()); loadLikes();
+        (() => {
+          const interactiveSelector = 'a,button,input,textarea,select,label';
+          const holdDelay = 1000;
+          const meterDelay = 250;
+          const moveThreshold = 9;
+          const magnetRadius = 360;
+          const magnetMaxShift = 52;
+          const settleDuration = 380;
+          let interaction = null;
+
+          function directCards(grid) { return [...grid.children].filter((child) => child.classList?.contains('project-card')); }
+          function releasePointer(state) { try { if (state.card.hasPointerCapture?.(state.pointerId)) state.card.releasePointerCapture(state.pointerId); } catch {} }
+          function removeHoldMeter(state) {
+            window.clearTimeout(state.meterTimer); window.cancelAnimationFrame(state.meterFrame);
+            state.meterTimer = 0; state.meterFrame = 0;
+            state.meter?.remove(); state.meter = null;
+          }
+          function clearPending(state) { window.clearTimeout(state.timer); state.timer = 0; removeHoldMeter(state); state.card.classList.remove('is-hold-pending'); }
+          function showHoldMeter(state) {
+            if (interaction !== state || state.lifted) return;
+            const bounds = state.card.getBoundingClientRect();
+            const meter = document.createElement('span');
+            meter.className = 'drag-hold-meter'; meter.setAttribute('aria-hidden', 'true');
+            meter.style.left = `${Math.max(18, Math.min(bounds.width - 18, state.startX - bounds.left))}px`;
+            meter.style.top = `${Math.max(18, Math.min(bounds.height - 18, state.startY - bounds.top))}px`;
+            meter.style.setProperty('--hold-progress', '0'); state.card.append(meter); state.meter = meter;
+            window.requestAnimationFrame(() => meter.classList.add('is-visible'));
+            const animateMeter = (now) => {
+              if (interaction !== state || state.lifted || !state.meter) return;
+              const progress = Math.min(1, (now - state.meterStarted) / (holdDelay - meterDelay));
+              meter.style.setProperty('--hold-progress', progress.toFixed(3));
+              if (progress < 1) state.meterFrame = window.requestAnimationFrame(animateMeter);
+            };
+            state.meterStarted = performance.now(); state.meterFrame = window.requestAnimationFrame(animateMeter);
+          }
+          function beginHoldMeter(state) { state.meterTimer = window.setTimeout(() => showHoldMeter(state), meterDelay); }
+          function suspendGridTilt(grid) {
+            grid.classList.remove('has-active-card');
+            directCards(grid).forEach((card) => { card.vanillaTilt?.destroy(); card.classList.remove('is-tilt-active', 'is-pressed'); });
+          }
+          function resetGridMotion(grid) { directCards(grid).forEach((card) => { card.style.transition = ''; card.style.transform = ''; }); }
+          function animateCardsToSlots(grid, mutate) {
+            const cards = directCards(grid).filter((card) => card !== interaction?.card);
+            const visual = new Map(cards.map((card) => [card, card.getBoundingClientRect()]));
+            cards.forEach((card) => { card.style.transition = 'none'; card.style.transform = 'none'; });
+            mutate();
+            cards.forEach((card) => {
+              const from = visual.get(card); const to = card.getBoundingClientRect();
+              const x = from.left - to.left; const y = from.top - to.top;
+              card.style.transform = `translate3d(${Math.abs(x) < .5 ? 0 : x}px,${Math.abs(y) < .5 ? 0 : y}px,0)`;
+            });
+            void grid.offsetWidth;
+            window.requestAnimationFrame(() => {
+              if (!grid.classList.contains('is-dragging')) return;
+              cards.forEach((card) => {
+                card.style.transition = `transform ${settleDuration}ms cubic-bezier(.16,.84,.18,1)`;
+                card.style.transform = 'translate3d(0,0,0)';
+              });
+            });
+          }
+          function startMagneticField(state) {
+            state.fieldCards = directCards(state.grid).map((card) => ({ card, bounds:card.getBoundingClientRect(), x:0, y:0 }));
+            const animateField = () => {
+              state.frame = 0;
+              if (!state.lifted) return;
+              updateFloatingCard(state);
+              state.fieldCards.forEach((entry) => {
+                const centerX = entry.bounds.left + entry.bounds.width / 2; const centerY = entry.bounds.top + entry.bounds.height / 2;
+                let x = centerX - state.x; let y = centerY - state.y; let distance = Math.hypot(x, y);
+                if (distance < 1) { x = 1; y = 0; distance = 1; }
+                const strength = distance < magnetRadius ? magnetMaxShift * Math.pow(1 - distance / magnetRadius, 2) : 0;
+                const targetX = x / distance * strength; const targetY = y / distance * strength;
+                entry.x += (targetX - entry.x) * .2; entry.y += (targetY - entry.y) * .2;
+                entry.card.style.transform = `translate3d(${entry.x.toFixed(2)}px,${entry.y.toFixed(2)}px,0)`;
+              });
+              state.frame = window.requestAnimationFrame(animateField);
+            };
+            state.frame = window.requestAnimationFrame(animateField);
+          }
+          function stopMagneticField(state) { if (state.frame) window.cancelAnimationFrame(state.frame); state.frame = 0; }
+          function createPlaceholder(bounds) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'project-card-placeholder';
+            placeholder.setAttribute('aria-hidden', 'true');
+            placeholder.style.setProperty('--drag-placeholder-height', `${Math.ceil(bounds.height)}px`);
+            placeholder.style.height = `${Math.ceil(bounds.height)}px`;
+            return placeholder;
+          }
+          function updateFloatingCard(state) {
+            const travelX = state.x - state.lastX;
+            const targetRotation = Math.max(-2.3, Math.min(2.3, travelX * .15));
+            state.rotation += (targetRotation - state.rotation) * .58;
+            state.card.style.left = `${Math.round(state.x - state.offsetX)}px`; state.card.style.top = `${Math.round(state.y - state.offsetY)}px`;
+            state.card.style.transform = `translate3d(0,0,0) rotate(${state.rotation.toFixed(2)}deg) scale(1.045)`;
+            state.lastX = state.x; state.lastY = state.y;
+          }
+          function nearestDropIndex(state) {
+            const slots = state.fieldCards || directCards(state.grid).map((card) => ({ card, bounds:card.getBoundingClientRect() }));
+            if (!slots.length) return 0;
+            let targetIndex = 0; let targetBounds = slots[0].bounds; let shortest = Infinity;
+            slots.forEach((slot, index) => {
+              const { bounds } = slot; const x = state.x - (bounds.left + bounds.width / 2); const y = state.y - (bounds.top + bounds.height / 2);
+              const distance = x * x + y * y;
+              if (distance < shortest) { shortest = distance; targetIndex = index; targetBounds = bounds; }
+            });
+            const centerX = targetBounds.left + targetBounds.width / 2; const centerY = targetBounds.top + targetBounds.height / 2;
+            const sameRow = Math.abs(state.y - centerY) < targetBounds.height * .34;
+            return targetIndex + ((sameRow ? state.x < centerX : state.y < centerY) ? 0 : 1);
+          }
+          function liftCard(state) {
+            if (interaction !== state) return;
+            clearPending(state); state.lifted = true;
+            const { card, grid } = state;
+            suspendGridTilt(grid);
+            const bounds = card.getBoundingClientRect();
+            state.offsetX = Math.max(0, Math.min(bounds.width, state.x - bounds.left));
+            state.offsetY = Math.max(0, Math.min(bounds.height, state.y - bounds.top));
+            state.originalNext = card.nextElementSibling;
+            state.placeholder = createPlaceholder(bounds);
+            grid.classList.add('is-dragging');
+            grid.insertBefore(state.placeholder, card); document.body.append(card);
+            card.classList.remove('is-pressed');
+            card.classList.add('is-dragging');
+            card.setAttribute('aria-grabbed', 'true');
+            card.style.width = `${Math.ceil(bounds.width)}px`; card.style.height = `${Math.ceil(bounds.height)}px`;
+            card.style.margin = '0'; card.style.transition = 'none'; card.style.transformOrigin = 'center center';
+            card.style.left = `${Math.round(state.x - state.offsetX)}px`; card.style.top = `${Math.round(state.y - state.offsetY)}px`;
+            card.style.transform = 'translate3d(0,0,0) rotate(0deg) scale(1)';
+            state.lastX = state.x; state.lastY = state.y; state.rotation = 0;
+            window.requestAnimationFrame(() => { if (!state.lifted) return; card.style.transition = 'transform 180ms cubic-bezier(.2,.8,.2,1)'; startMagneticField(state); });
+          }
+          function settlePlaceholder(state, cancelled) {
+            const reference = cancelled
+              ? (state.originalNext?.parentElement === state.grid ? state.originalNext : null)
+              : (state.fieldCards[nearestDropIndex(state)]?.card || null);
+            animateCardsToSlots(state.grid, () => state.grid.insertBefore(state.placeholder, reference));
+          }
+          function finishLift(state, cancelled) {
+            const { card, grid, placeholder } = state;
+            stopMagneticField(state); state.lifted = false; settlePlaceholder(state, cancelled);
+            const target = placeholder.getBoundingClientRect();
+            const startLeft = Number.parseFloat(card.style.left) || card.getBoundingClientRect().left;
+            const startTop = Number.parseFloat(card.style.top) || card.getBoundingClientRect().top;
+            grid.insertBefore(card, placeholder);
+            card.style.transition = 'none'; card.style.left = `${startLeft}px`; card.style.top = `${startTop}px`;
+            card.style.transform = `translate3d(0,0,0) rotate(${state.rotation || 0}deg) scale(1.045)`;
+            window.requestAnimationFrame(() => {
+              card.style.transition = 'left 340ms cubic-bezier(.16,.84,.18,1),top 340ms cubic-bezier(.16,.84,.18,1),transform 340ms cubic-bezier(.16,.84,.18,1)';
+              card.style.left = `${Math.round(target.left)}px`; card.style.top = `${Math.round(target.top)}px`;
+              card.style.transform = 'translate3d(0,0,0) rotate(0deg) scale(1)';
+            });
+            window.setTimeout(() => {
+              placeholder.remove(); card.classList.remove('is-dragging', 'is-pressed');
+              card.setAttribute('aria-grabbed', 'false');
+              ['width', 'height', 'margin', 'left', 'top', 'transition', 'transform', 'transformOrigin'].forEach((property) => { card.style[property] = ''; });
+              resetGridMotion(grid); grid.classList.remove('is-dragging'); enableGamepactTilt(grid);
+            }, 540);
+          }
+          function clearInteraction(state) {
+            stopMagneticField(state);
+            clearPending(state); releasePointer(state); state.card.classList.remove('is-pressed');
+            if (interaction === state) interaction = null;
+          }
+          [modGrid, gameGrid].forEach((grid) => {
+            grid.addEventListener('pointerdown', (event) => {
+              const card = event.target.closest('.project-card');
+              if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0) || !card || card.parentElement !== grid || event.target.closest(interactiveSelector) || interaction) return;
+              const state = { card, grid, pointerId:event.pointerId, x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, timer:0, meterTimer:0, meterFrame:0, meter:null, lifted:false, rotation:0 };
+              interaction = state; card.classList.add('is-hold-pending');
+              try { card.setPointerCapture(event.pointerId); } catch {}
+              beginHoldMeter(state); state.timer = window.setTimeout(() => liftCard(state), holdDelay);
+            });
+            grid.addEventListener('contextmenu', (event) => { if (interaction?.grid === grid) event.preventDefault(); });
+          });
+          window.addEventListener('pointermove', (event) => {
+            const state = interaction;
+            if (!state || event.pointerId !== state.pointerId) return;
+            state.x = event.clientX; state.y = event.clientY;
+            if (!state.lifted) {
+              if (Math.hypot(state.x - state.startX, state.y - state.startY) > moveThreshold) clearInteraction(state);
+              return;
+            }
+            event.preventDefault();
+          }, { passive:false });
+          window.addEventListener('pointerup', (event) => {
+            const state = interaction;
+            if (!state || event.pointerId !== state.pointerId) return;
+            if (!state.lifted) { clearInteraction(state); return; }
+            event.preventDefault(); clearPending(state); releasePointer(state); interaction = null; finishLift(state, false);
+          }, { passive:false });
+          window.addEventListener('pointercancel', (event) => {
+            const state = interaction;
+            if (!state || event.pointerId !== state.pointerId) return;
+            if (!state.lifted) { clearInteraction(state); return; }
+            clearPending(state); releasePointer(state); interaction = null; finishLift(state, true);
+          });
+          window.addEventListener('blur', () => { const state = interaction; if (!state) return; if (!state.lifted) { clearInteraction(state); return; } clearPending(state); releasePointer(state); interaction = null; finishLift(state, true); });
+        })();
       })();
     </script>
   </body>
