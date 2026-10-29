@@ -1,6 +1,7 @@
 # GitHub Pages 发布约束
 
 - 本目录是发布仓库。完整源项目在父目录：内容源为 `../data/site.json`，模板为 `../index.template.html`。同时遵守父目录 `AGENTS.md`。
+- MOD 按游戏汇总，每款游戏默认一张卡片；同一游戏新增 MOD 时复用已有卡片，优先链接到作者在该游戏下的作品列表。深空当铺使用 `https://steamcommunity.com/id/Masaicker/myworkshopfiles/?appid=4348910`，不为每个 MOD 单独建卡。
 - 每次新增内容或生成前，先检查本仓库工作区和远程分支；将 `index.html` 中 `const SITE_DATA = ...;` 的 JSON 部分替换为 `__SITE_DATA__`，与父目录模板完整比较。
 - 仅排除内容数据，不忽略 HTML、CSS 或 JavaScript 差异。若有功能或交互差异，列出差异及相关提交，先让小马决定以哪个版本为准；决定前不得覆盖、生成或推送功能变更，也不得自行恢复已删除的效果。
 - 选定功能版本后，同步修正父目录模板和发布页。仅修改发布页会导致下次生成重新带回旧代码。
